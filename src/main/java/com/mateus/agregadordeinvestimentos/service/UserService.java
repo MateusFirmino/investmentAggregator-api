@@ -1,6 +1,7 @@
 package com.mateus.agregadordeinvestimentos.service;
 
 import com.mateus.agregadordeinvestimentos.controller.CreateUserDto;
+import com.mateus.agregadordeinvestimentos.controller.UpdateUserDto;
 import com.mateus.agregadordeinvestimentos.entity.User;
 import com.mateus.agregadordeinvestimentos.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -26,7 +27,8 @@ public class UserService {
       createUserDto.email(),
       createUserDto.password(),
       Instant.now(),
-      null);
+      null
+    );
 
     var userSaved = userRepository.save(entity);
 
@@ -40,6 +42,42 @@ public class UserService {
 
   public List<User> listUsers() {
     return userRepository.findAll();
+  }
+
+  public void updateUserById(
+    String userId,
+    UpdateUserDto updateUserDto
+  ) {
+
+    var id = UUID.fromString(userId);
+
+    var userEntity = userRepository.findById(id);
+
+    if (userEntity.isPresent()) {
+      var user = userEntity.get();
+
+      if (updateUserDto.username() != null) {
+        user.setUsername(updateUserDto.username());
+      }
+
+      if (updateUserDto.password() != null) {
+        user.setPassword(updateUserDto.password());
+      }
+
+      userRepository.save(user);
+    }
+
+  }
+
+  public void deleteById(String userId) {
+
+    var id = UUID.fromString(userId);
+
+    var userExists = userRepository.existsById(id);
+
+    if (userExists) {
+      userRepository.deleteById(id);
+    }
   }
 
 }
